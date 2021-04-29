@@ -54,8 +54,6 @@ def listTransactions():
     print('Lista de Transações')
     print('')
     lista = sheet.getAll()
-    for row in lista:
-        
     
 while loop == 1:
     clear()
