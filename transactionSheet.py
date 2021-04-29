@@ -1,4 +1,6 @@
 import gspread 
+import pandas as pd
+from transaction import Transaction
 from oauth2client.service_account import ServiceAccountCredentials
 
 class TransactionSheet:
@@ -11,6 +13,12 @@ class TransactionSheet:
       self.sheet = sheet.get_worksheet(0)
       
     def getAll(self):
-        return self.sheet.get_all_records()
+        return pd.DataFrame(self.sheet.get_all_records())
+    def getTotal(self):
+        df = pd.DataFrame(self.sheet.get_all_records())
+        _total = df['value'].sum()
+        _total_types = df.groupby(['type']).sum()
+        return { 'total': _total, 'types': _total_types }
     def add(self,transaction):
-        self.sheet.append_row([transaction.title, transaction.value, transaction.type, transaction.category])
+        value = '-' + transaction.value if transaction.type == 'S' else transaction.value
+        self.sheet.append_row([transaction.title, value, transaction.type, transaction.category])

@@ -1,6 +1,7 @@
 from os import system,name
 from transactionSheet import TransactionSheet
 from transaction import Transaction
+from tabulate import tabulate
 
 menus = ['Nova Transação', 'Listar Transações', 'Total', 'Sair']
 loop = 1
@@ -18,14 +19,24 @@ def header():
 def menu():
     for i in range(len(menus)):
         print('{} - {}'.format(i + 1,menus[i]))
+    
     print('')
     
-    opcao = int(input('Informe uma opção: '))
+    try:
+        opcao = int(input('Informe uma opção: '))
+    except:
+        print('')
+        print('Opção inválida!')
+        input('Pressione enter para continuar...')
+        print('')
+        return
     
     if opcao == 1:
         newTransaction()
     elif opcao == 2:
         listTransactions()
+    elif opcao == 3:
+        showTotal()
     else:
         clear()
         
@@ -43,7 +54,7 @@ def newTransaction():
     
     transaction = Transaction()
     transaction.title = str(input('Título: '))
-    transaction.value = float(input('Valor: '))
+    transaction.value = str(input('Valor: ')).replace(",",".")
     transaction.type = str(input('Tipo: '))
     transaction.category = str(input('Categoria: '))
     sheet.add(transaction)
@@ -54,7 +65,27 @@ def listTransactions():
     print('Lista de Transações')
     print('')
     lista = sheet.getAll()
-    
+    tableHeader = ["Título","Valor","Tipo","Categoria"]
+    table = tabulate(lista, headers=tableHeader)
+    print(table)
+    print('')
+    input('Pressione enter para voltar...')
+
+def showTotal():
+    newPage('Total')
+    total = sheet.getTotal()
+    table = tabulate(total['types'], headers=['Tipo','Valor'])
+    print(table)
+    print('')
+    print('Saldo: ' + str(total['total']))
+    print('')
+    input('Pressione enter para voltar...')
+
+def newPage(title):
+    clear()
+    header()
+    print(title)
+    print('')
 while loop == 1:
     clear()
     header()
